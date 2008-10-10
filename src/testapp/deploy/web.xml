@@ -6,12 +6,12 @@
 
     <display-name>Interactive Test Application</display-name>
     <description>
-        An interactive application to test the echo3 file transfer components.
+        An interactive application to test the echo3 chart components.
     </description>
 
     <servlet>
       <servlet-name>EchoInteractiveServlet</servlet-name>
-      <servlet-class>nextapp.echo.filetransfer.testapp.FTLTestServlet</servlet-class>
+      <servlet-class>nextapp.echo.chart.testapp.ChartTestServlet</servlet-class>
       <init-param>
         <param-name>echo.debug</param-name>
         <param-value>true</param-value>

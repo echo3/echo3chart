@@ -29,7 +29,7 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
 --> 
  
-<project name="NextApp_Echo_3_FileTransfer" default="dist" basedir=".">
+<project name="NextApp_Echo_3_Chart" default="dist" basedir=".">
 
     <property environment="env"/>
     <property file="ant.properties"/>
@@ -72,6 +72,7 @@
                 source="${ant.build.javac.source}" target="${ant.build.javac.target}">
         	<classpath>
         		<pathelement path="${echo3.app.lib.jar}"/>
+        		<fileset dir="lib"/>
         	 </classpath>
     	</javac>
         <copy todir="${dir.build.app}">
@@ -83,7 +84,7 @@
     
     <target name="dist.app" depends="clean,compile.app">
         <mkdir dir="${dir.dist.lib}"/>
-        <jar jarfile="${dir.dist.lib}/${jarfile.ft.app}" basedir="${dir.build.app}"/>
+        <jar jarfile="${dir.dist.lib}/${jarfile.chart.app}" basedir="${dir.build.app}"/>
     </target>
             
     <target name="compile.webcontainer" depends="compile.app" description="Compile Web Container source files">
@@ -95,8 +96,7 @@
             	<pathelement path="${echo3.webcontainer.lib.jar}"/>
             	<pathelement path="${echo3.app.lib.jar}"/>
                 <pathelement path="${servlet.lib.jar}"/>
-                <pathelement path="${ft.commons-io.lib.jar}"/>
-                <pathelement path="${ft.commons-fileupload.lib.jar}"/>
+            	<fileset dir="lib"/>
             </classpath>
         </javac>
         <copy todir="${dir.build.webcontainer}">
@@ -108,7 +108,7 @@
     
     <target name="dist.webcontainer" depends="clean,compile.webcontainer">
         <mkdir dir="${dir.dist.lib}"/>
-        <jar jarfile="${dir.dist.lib}/${jarfile.ft.webcontainer}" basedir="${dir.build.webcontainer}"/>
+        <jar jarfile="${dir.dist.lib}/${jarfile.chart.webcontainer}" basedir="${dir.build.webcontainer}"/>
     </target>
         
     <target name="dist" depends="clean, dist.app, dist.webcontainer"/>
@@ -118,10 +118,11 @@
         <mkdir dir="${dir.build.testapp}/WEB-INF/lib"/>
         <copy todir="${dir.build.testapp}/WEB-INF/lib" file="${echo3.app.lib.jar}"/>
         <copy todir="${dir.build.testapp}/WEB-INF/lib" file="${echo3.webcontainer.lib.jar}"/>
-        <copy todir="${dir.build.testapp}/WEB-INF/lib" file="${dir.dist.lib}/${jarfile.ft.app}"/>
-        <copy todir="${dir.build.testapp}/WEB-INF/lib" file="${dir.dist.lib}/${jarfile.ft.webcontainer}"/>
-        <copy todir="${dir.build.testapp}/WEB-INF/lib" file="${ft.commons-io.lib.jar}"/>
-        <copy todir="${dir.build.testapp}/WEB-INF/lib" file="${ft.commons-fileupload.lib.jar}"/>
+        <copy todir="${dir.build.testapp}/WEB-INF/lib" file="${dir.dist.lib}/${jarfile.chart.app}"/>
+        <copy todir="${dir.build.testapp}/WEB-INF/lib" file="${dir.dist.lib}/${jarfile.chart.webcontainer}"/>
+        <copy todir="${dir.build.testapp}/WEB-INF/lib">
+        	<fileset dir="lib"/>
+        </copy>
         <copy todir="${dir.build.testapp}/WEB-INF">
             <fileset dir="${dir.deploy.testapp}"/>
         </copy>
@@ -131,11 +132,12 @@
         <javac srcdir="${dir.src.testapp}" destdir="${dir.build.testapp}/WEB-INF/classes" debug="${debug}" deprecation="yes" 
                 source="${ant.build.javac.source}" target="${ant.build.javac.target}">
             <classpath>
-                <pathelement path="${dir.dist.lib}/${jarfile.ft.app}"/>
-                <pathelement path="${dir.dist.lib}/${jarfile.ft.webcontainer}"/>
+                <pathelement path="${dir.dist.lib}/${jarfile.chart.app}"/>
+                <pathelement path="${dir.dist.lib}/${jarfile.chart.webcontainer}"/>
                 <pathelement path="${servlet.lib.jar}"/>
                 <pathelement path="${echo3.app.lib.jar}"/>
                 <pathelement path="${echo3.webcontainer.lib.jar}"/>
+            	<fileset dir="lib"/>
             </classpath>
         </javac>
         <copy todir="${dir.build.testapp}/WEB-INF/classes">
