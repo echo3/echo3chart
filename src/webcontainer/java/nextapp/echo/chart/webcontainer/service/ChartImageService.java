@@ -29,6 +29,8 @@ package nextapp.echo.chart.webcontainer.service;
  * the terms of any one of the MPL, the GPL or the LGPL.
  */
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -46,7 +48,9 @@ import nextapp.echo.webcontainer.UserInstance;
 import nextapp.echo.webcontainer.WebContainerServlet;
 import nextapp.echo.webcontainer.util.PngEncoder;
 
+import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.entity.EntityCollection;
 
 /**
  * <code>Service</code> to render chart images.
@@ -125,9 +129,18 @@ implements Service {
                 
                 JFreeChart chart =  chartDisplay.getChart();
                 BufferedImage image;
+                ChartRenderingInfo info = new ChartRenderingInfo();
                 synchronized (chart) {
-                    image = chart.createBufferedImage(width, height);
+                    image = chart.createBufferedImage(width, height, info);
                 }
+//                EntityCollection coll = info.getEntityCollection();
+//                debug("About to show entities");
+//                for (int i = 0; i < coll.getEntityCount(); i++) {
+//                	debug("Entity: " + coll.getEntity(i).getShapeCoords());
+//                	debug("Entity: " + coll.getEntity(i).getShapeType());
+//                	debug("Entity: " + coll.getEntity(i).getToolTipText());
+//                }
+                
                 PngEncoder encoder = new PngEncoder(image, true, null, 3);
                 conn.setContentType(ContentType.IMAGE_PNG);
                 OutputStream out = conn.getOutputStream();
@@ -138,6 +151,10 @@ implements Service {
             // leaving us with an IOException.  This exception is silently eaten.
             ex.printStackTrace();
         }
+    }
+    
+    private void debug(String s) {
+    	System.out.println(s);
     }
 
 	/**

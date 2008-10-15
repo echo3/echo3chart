@@ -29,6 +29,8 @@ package nextapp.echo.chart.app;
  * the terms of any one of the MPL, the GPL or the LGPL.
  */
 
+import java.util.EventListener;
+
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.ChartChangeListener;
@@ -36,16 +38,33 @@ import org.jfree.chart.plot.Plot;
 
 import nextapp.echo.app.Component;
 import nextapp.echo.app.Extent;
+import nextapp.echo.app.event.ActionEvent;
+import nextapp.echo.app.event.ActionListener;
 
 /**
  * A component which displays a <code>JFreeChart</code>.
  */
 public class ChartDisplay extends Component {
-
+	
+    public static final String INPUT_ACTION = "action";
+    
+    public static final String ACTION_LISTENERS_CHANGED_PROPERTY = "actionListeners";
+    public static final String ACTION_COMMAND_PROPERTY = "actionCommand";
     public static final String CHART_CHANGED_PROPERTY = "chart";
     public static final String CHART_CONTENT_CHANGED_PROPERTY = "chartContent";
     public static final String PROPERTY_HEIGHT = "height";
     public static final String PROPERTY_WIDTH = "width";
+    
+    /**
+     * The array of action commands, in the same
+     * sequence as the series added to the chart.
+     */
+    private String[] actionCommands;
+    
+    /**
+     * The action command that the client has just triggered.
+     */
+    private String triggeredActionCommand;
     
     /**
      * The displayed <code>JFreeChart</code>.
@@ -94,6 +113,36 @@ public class ChartDisplay extends Component {
     }
     
     /**
+     * Adds an <code>ActionListener</code> to receive notification of user
+     * actions, i.e., button presses.
+     * 
+     * @param l the listener to add
+     */
+    public void addActionListener(ActionListener l) {
+        getEventListenerList().addListener(ActionListener.class, l);
+        firePropertyChange(ACTION_LISTENERS_CHANGED_PROPERTY, null, l);
+    }
+
+    /**
+     * Notifies all listeners that have registered for this event type.
+     * 
+     * @param e the <code>ActionEvent</code> to send
+     */
+    public void fireActionPerformed(ActionEvent e) {
+        if (!hasEventListenerList()) {
+            return;
+        }
+        EventListener[] listeners = getEventListenerList().getListeners(ActionListener.class);
+        for (int index = 0; index < listeners.length; ++index) {
+            ((ActionListener) listeners[index]).actionPerformed(e);
+        }
+    }
+    
+    public String[] getActionCommands() {
+    	return actionCommands;
+    }
+    
+    /**
      * Returns the displayed <code>JFreeChart</code>.
      * 
      * @return the displayed <code>JFreeChart</code> 
@@ -121,7 +170,50 @@ public class ChartDisplay extends Component {
     public Extent getWidth() {
         return (Extent) get(PROPERTY_WIDTH);
     }
+
+    /**
+     * Determines if the button has any <code>ActionListener</code>s 
+     * registered.
+     * 
+     * @return true if any action listeners are registered
+     */
+    public boolean hasActionListeners() {
+        return hasEventListenerList() && getEventListenerList().getListenerCount(ActionListener.class) != 0;
+    }
+
+    /**
+     * @see nextapp.echo.app.Component#processInput(java.lang.String, java.lang.Object)
+     */
+    public void processInput(String name, Object value) {
+        super.processInput(name, value);
+        if (ACTION_COMMAND_PROPERTY.equals(name)) {
+        	this.triggeredActionCommand = (String) value;
+        }
+        if (INPUT_ACTION.equals(name)) {
+            fireActionPerformed(new ActionEvent(this, triggeredActionCommand));
+        }
+    }
+
+    /**
+     * Removes an <code>ActionListener</code> from being notified of user
+     * actions, i.e., button presses.
+     * 
+     * @param l the listener to remove
+     */
+    public void removeActionListener(ActionListener l) {
+        if (!hasEventListenerList()) {
+            return;
+        }
+        getEventListenerList().removeListener(ActionListener.class, l);
+        // Notification of action listener changes is provided due to 
+        // existence of hasActionListeners() method. 
+        firePropertyChange(ACTION_LISTENERS_CHANGED_PROPERTY, l, null);
+    }
     
+    public void setActionCommands(String[] actionCommands) {
+    	this.actionCommands = actionCommands;
+    }
+   
     /**
      * Sets the displayed <code>JFreeChart</code>.
      * 

@@ -29,13 +29,27 @@
 
 package nextapp.echo.chart.testapp.testscreen;
 
+import java.awt.geom.Rectangle2D;
+
+import nextapp.echo.app.Component;
+import nextapp.echo.app.ContentPane;
 import nextapp.echo.app.Extent;
+import nextapp.echo.app.Label;
 import nextapp.echo.app.SplitPane;
+import nextapp.echo.app.Window;
+import nextapp.echo.app.WindowPane;
 import nextapp.echo.app.event.ActionEvent;
 import nextapp.echo.app.event.ActionListener;
 import nextapp.echo.chart.app.ChartDisplay;
 import nextapp.echo.chart.testapp.ButtonColumn;
 
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartRenderingInfo;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.entity.ChartEntity;
+import org.jfree.chart.labels.PieToolTipGenerator;
+import org.jfree.chart.labels.StandardPieToolTipGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.DefaultKeyedValues;
 import org.jfree.data.general.DefaultPieDataset;
@@ -60,9 +74,28 @@ public class PieChartTest extends SplitPane {
         
         final DefaultPieDataset pieDataset = new DefaultPieDataset(new DefaultPieDataset(values));
         PiePlot piePlot = new PiePlot(pieDataset);
+        piePlot.setToolTipGenerator(new StandardPieToolTipGenerator());
         
         final ChartDisplay chartDisplay = new ChartDisplay(piePlot);
         add(chartDisplay);
+        
+        chartDisplay.setActionCommands(new String[]{"Widgets", "Cubits", "Zonkits"});
+        chartDisplay.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent arg0) {
+				WindowPane window = new WindowPane("Chart series clicked", new Extent(300), new Extent(200));
+				window.add(new Label("You clicked on " + arg0.getActionCommand()));
+				Component contentPane = getParent();
+				while(!(contentPane instanceof ContentPane)) {
+					contentPane = contentPane.getParent();
+				}
+				contentPane.add(window);
+			}});
+        
+        ChartPanel chartPanel = new ChartPanel(new JFreeChart(piePlot));
+        chartPanel.setRefreshBuffer(true);
+        ChartEntity entity = chartPanel.getEntityForPoint(50, 50);
+        System.out.println("Entity: " + entity);
         
         controlsColumn.addButton("Set Width = 800px", new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -104,4 +137,6 @@ public class PieChartTest extends SplitPane {
             }
         });
     }
+    
+    
 }
