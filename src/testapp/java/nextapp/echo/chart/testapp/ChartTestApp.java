@@ -100,7 +100,7 @@ public class ChartTestApp extends ApplicationInstance {
     public Window init() {
         setStyleSheet(Styles.DEFAULT_STYLE_SHEET);
         mainWindow = new Window();
-        mainWindow.setTitle("NextApp File Transfer Test Application");
+        mainWindow.setTitle("NextApp Chart Test Application");
         mainWindow.setContent(new WelcomePane());
         return mainWindow;
     }

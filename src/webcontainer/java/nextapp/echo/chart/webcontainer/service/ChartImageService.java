@@ -60,7 +60,12 @@ implements Service {
     /**
      * Parameter keys used in generating service URI.
      */
-    private static final String[] URI_PARAMETER_KEYS = {"chartId"}; 
+    private static final String[] URI_PARAMETER_KEYS = {"chartId", "v"};
+    /**
+     * A version property which is ignored on the server but which forces the browser to
+     * reload the image.
+     */
+    private int version = 0;
     
     /**
      * Returns the appropriate URI to display a chart for a specific 
@@ -73,7 +78,7 @@ implements Service {
      * @return the URI
      */
     public String createUri(UserInstance userInstance, ChartDisplay chartDisplay) {
-        return userInstance.getServiceUri(INSTANCE, URI_PARAMETER_KEYS, new String[]{chartDisplay.getRenderId()});
+        return userInstance.getServiceUri(INSTANCE, URI_PARAMETER_KEYS, new String[]{chartDisplay.getRenderId(), String.valueOf(++version)});
     }
     
     /**

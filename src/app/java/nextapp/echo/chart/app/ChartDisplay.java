@@ -80,6 +80,8 @@ public class ChartDisplay extends Component {
      */
     public ChartDisplay(JFreeChart chart) {
         super();
+        setWidth(new Extent(400));
+        setHeight(new Extent(400));
         setChart(chart);
     }
 

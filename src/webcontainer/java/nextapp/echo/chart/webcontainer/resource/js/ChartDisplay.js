@@ -26,7 +26,7 @@ Echo.Chart.Render.ChartDisplaySync = Core.extend(Echo.Render.ComponentSync, {
         Echo.Render.registerPeer("EchoChartDisplay", this);
     },
 
-	_containerElement: null,    
+	_containerElement: null,
     _node: null,
     
     renderAdd: function(update, parentElement) {
@@ -36,12 +36,10 @@ Echo.Chart.Render.ChartDisplaySync = Core.extend(Echo.Render.ComponentSync, {
         var height = this.component.render("height");
         
         var img = document.createElement("img");
-        this._node; = img;
+        this._node = img;
         parentElement.appendChild(img);
         img.id = this.component.renderId;
         img.src = this.component.get("uri");
-        img.style.width = width + "px";
-        img.style.height = height + "px";
     },
     
     renderDispose: function(update) {

@@ -77,7 +77,7 @@ public class WelcomePane extends ContentPane {
         
         WindowPane loginWindow = new WindowPane();
         loginWindow.setMaximizeEnabled(true);
-        loginWindow.setTitle("Welcome to the NextApp Echo File Transfer Test Application");
+        loginWindow.setTitle("Welcome to the NextApp Echo Chart Test Application");
         loginWindow.setStyleName("WelcomePane");
         loginWindow.setClosable(false);
         add(loginWindow);
@@ -109,7 +109,7 @@ public class WelcomePane extends ContentPane {
         label.setFont(new Font(null, Font.BOLD, null));
         infoColumn.add(label);
         
-        label = new Label("This application was built to interactively test the Echo File Transfer Library.");
+        label = new Label("This application was built to interactively test the Echo Chart Library.");
         infoColumn.add(label);
 
         label = new Label("Please visit the Echo Home Page @ http://www.nextapp.com/products/echo for more information.");

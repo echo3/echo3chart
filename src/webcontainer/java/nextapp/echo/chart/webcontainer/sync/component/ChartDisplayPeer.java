@@ -16,7 +16,11 @@
 # ================================================================= */
 package nextapp.echo.chart.webcontainer.sync.component;
 
+import java.util.Iterator;
+
 import nextapp.echo.app.Component;
+import nextapp.echo.app.Table;
+import nextapp.echo.app.update.ServerComponentUpdate;
 import nextapp.echo.app.util.Context;
 import nextapp.echo.chart.app.ChartDisplay;
 import nextapp.echo.chart.webcontainer.service.ChartImageService;
@@ -25,6 +29,8 @@ import nextapp.echo.webcontainer.ServerMessage;
 import nextapp.echo.webcontainer.Service;
 import nextapp.echo.webcontainer.WebContainerServlet;
 import nextapp.echo.webcontainer.service.JavaScriptService;
+import nextapp.echo.webcontainer.util.ArrayIterator;
+import nextapp.echo.webcontainer.util.MultiIterator;
 
 public class ChartDisplayPeer
         extends AbstractComponentSynchronizePeer {
@@ -32,14 +38,14 @@ public class ChartDisplayPeer
 	public static final int DEFAULT_WIDTH = 200;
 	public static final int DEFAULT_HEIGHT = 200;
 	
-    protected static final Service DATE_FIELD_SERVICE = JavaScriptService.forResource("Echo.Chart.ChartDisplay",
-            "nextapp/echo/chart/webcontainer/resource/js/Ext20.DateField.js");
+    protected static final Service CHART_DISPLAY_SERVICE = JavaScriptService.forResource("Echo.Chart.ChartDisplay",
+            "nextapp/echo/chart/webcontainer/resource/js/ChartDisplay.js");
     
     private static final String PROPERTY_URI = "uri";
 
 
     static {
-        WebContainerServlet.getServiceRegistry().add(DATE_FIELD_SERVICE);
+        WebContainerServlet.getServiceRegistry().add(CHART_DISPLAY_SERVICE);
     }
 
     public ChartDisplayPeer() {
@@ -69,6 +75,25 @@ public class ChartDisplayPeer
         
         return ret;
     }
+    
+    /**
+     * @see nextapp.echo.webcontainer.AbstractComponentSynchronizePeer#getUpdatedOutputPropertyNames(
+     *      nextapp.echo.app.util.Context,
+     *      nextapp.echo.app.Component,
+     *      nextapp.echo.app.update.ServerComponentUpdate)
+     */
+    public Iterator getUpdatedOutputPropertyNames(Context context, Component component, 
+            ServerComponentUpdate update) {
+        Iterator normalPropertyIterator = super.getUpdatedOutputPropertyNames(context, component, update);
+        
+        if (update.hasUpdatedProperty(ChartDisplay.PROPERTY_HEIGHT)
+        		|| update.hasUpdatedProperty(ChartDisplay.PROPERTY_WIDTH)) {
+            return new MultiIterator(
+                    new Iterator[]{ normalPropertyIterator, new ArrayIterator(new String[]{PROPERTY_URI}) });
+        } else {
+            return normalPropertyIterator;
+        }
+    }
 
     /**
      * @see nextapp.echo.webcontainer.ComponentSynchronizePeer#init(Context)
@@ -76,6 +101,6 @@ public class ChartDisplayPeer
     public void init(Context context, Component c) {
         super.init(context, c);
       ServerMessage serverMessage = (ServerMessage) context.get(ServerMessage.class);
-      serverMessage.addLibrary(DATE_FIELD_SERVICE.getId());
+      serverMessage.addLibrary(CHART_DISPLAY_SERVICE.getId());
     }
 }

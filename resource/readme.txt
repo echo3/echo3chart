@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------
-Echo File Transfer, version 3.0
+Echo Chart, version 3.0
 Copyright (C) 2002-2007 NextApp, Inc.
 
 http://www.nextapp.com/products/echo3/filetransfer
 
 ----------------------------------------------------------------------
-Echo File Transfer is licensed under the Mozilla Public License.
+Echo Chart is licensed under the Mozilla Public License.
 Please see the files in the /Licensing folder for more information.
 
 ----------------------------------------------------------------------
@@ -13,7 +13,7 @@ This archive/package contains the following directory structure:
 
 /SourceCode         - Provides the source code of the framework.  
 
-/BinaryLibraries    - Provides binary versions of the Echo File Transfer libraries.
+/BinaryLibraries    - Provides binary versions of the Echo Chart libraries.
 
 /BinaryApplications - Contains binary test and example applications,
                       packages as Web Archives (WAR files).
