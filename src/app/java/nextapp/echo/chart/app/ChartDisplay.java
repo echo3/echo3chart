@@ -43,6 +43,7 @@ import nextapp.echo.app.event.ActionListener;
 
 /**
  * A component which displays a <code>JFreeChart</code>.
+ * @author sgodden
  */
 public class ChartDisplay extends Component {
 	
@@ -95,7 +96,7 @@ public class ChartDisplay extends Component {
     
     /**
      * Creates a new <code>ChartDisplay</code> component that is initially displaying
-     * a specific <code>JFreeChart</code>.
+     * a specific <code>JFreeChart</code>, with a default width and height of 400 pixels.
      */
     public ChartDisplay(JFreeChart chart) {
         super();
@@ -114,7 +115,7 @@ public class ChartDisplay extends Component {
     
     /**
      * Adds an <code>ActionListener</code> to receive notification of user
-     * actions, i.e., button presses.
+     * actions clicks on a particular chart series.
      * 
      * @param l the listener to add
      */
@@ -138,6 +139,12 @@ public class ChartDisplay extends Component {
         }
     }
     
+    /**
+     * Returns the action commands relating to the
+     * series in the chart.
+     * @return the action commands.
+     * @see #setActionCommands(String[])
+     */
     public String[] getActionCommands() {
     	return actionCommands;
     }
@@ -195,8 +202,7 @@ public class ChartDisplay extends Component {
     }
 
     /**
-     * Removes an <code>ActionListener</code> from being notified of user
-     * actions, i.e., button presses.
+     * Removes an <code>ActionListener</code>.
      * 
      * @param l the listener to remove
      */
@@ -210,6 +216,15 @@ public class ChartDisplay extends Component {
         firePropertyChange(ACTION_LISTENERS_CHANGED_PROPERTY, l, null);
     }
     
+    /**
+     * Sets the action commands that will be fired in action events
+     * when the user clicks on a series in the chart.
+     * <p>
+     * These commands must be specified in the same sequence as the
+     * sequence in which you add series to the chart.
+     * </p>
+     * @param actionCommands the action commands.
+     */
     public void setActionCommands(String[] actionCommands) {
     	this.actionCommands = actionCommands;
     }
