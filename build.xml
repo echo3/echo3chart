@@ -159,7 +159,7 @@
 	<target name="doc.app"
             description="Create public/protected JavaDoc documentation for Application">
         <mkdir dir="${dir.javadoc.app.public}"/>
-        <javadoc sourcepath="${dir.src.app}" packagenames="nextapp.echo.filetransfer.app.*" 
+        <javadoc sourcepath="${dir.src.app}" packagenames="nextapp.echo.chart.app.*" 
                 stylesheetfile="${javadoc.cssfile}"
                 destdir="${dir.javadoc.app.public}" 
                 WindowTitle="${javadoc.windowtitle}"
@@ -175,7 +175,7 @@
     <target name="doc.app.private"
             description="Create private JavaDoc documentation for Application">
         <mkdir dir="${dir.javadoc.app.private}"/>
-        <javadoc sourcepath="${dir.src.app}" packagenames="nextapp.echo.filetransfer.app.*" 
+        <javadoc sourcepath="${dir.src.app}" packagenames="nextapp.echo.chart.app.*" 
                 stylesheetfile="${javadoc.cssfile}"
                 destdir="${dir.javadoc.app.private}" 
                 WindowTitle="${javadoc.windowtitle}"
@@ -192,7 +192,7 @@
     <target name="doc.webcontainer"
             description="Create public/protected JavaDoc documentation for Web Container">
         <mkdir dir="${dir.javadoc.webcontainer.public}"/>
-        <javadoc sourcepath="${dir.src.app};${dir.src.webcontainer}" packagenames="nextapp.echo.filetransfer.webcontainer.*" 
+        <javadoc sourcepath="${dir.src.app};${dir.src.webcontainer}" packagenames="nextapp.echo.chart.webcontainer.*" 
                 stylesheetfile="${javadoc.cssfile}"
                 destdir="${dir.javadoc.webcontainer.public}" 
                 WindowTitle="${javadoc.windowtitle}"
@@ -212,7 +212,7 @@
     <target name="doc.webcontainer.private"
             description="Create private JavaDoc documentation for Web Container">
         <mkdir dir="${dir.javadoc.webcontainer.private}"/>
-        <javadoc sourcepath="${dir.src.app};${dir.src.webcontainer}" packagenames="nextapp.echo.filetransfer.webcontainer.*" 
+        <javadoc sourcepath="${dir.src.app};${dir.src.webcontainer}" packagenames="nextapp.echo.chart.webcontainer.*" 
                 stylesheetfile="${javadoc.cssfile}"
                 destdir="${dir.javadoc.webcontainer.private}" 
                 WindowTitle="${javadoc.windowtitle}"
