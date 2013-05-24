@@ -29,7 +29,7 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
 --> 
  
-<project name="echo3-chart" default="dist" basedir=".">
+<project name="echo3-chart" default="dist" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <property environment="env"/>
     <property file="custom-ant.properties"/>
@@ -51,10 +51,40 @@
         <include name="**/*gif"/>
         <include name="**/*xml"/>
     </patternset>
+
+    <target name="-check.dependencies">
+        <available file="${dir.lib}/echo3-app-${echo.version}.jar" property="dependencies.present"/>
+    </target>
+
+    <target name="mvn.dependencies" depends="-mvn.inittasks"
+            description="Fetches the required dependencies from Maven Central into the lib dir">
+
+        <artifact:dependencies filesetId="dependency.fileset">
+            <dependency groupId="com.nextapp" artifactId="echo3-app" version="${echo.version}"/>
+            <dependency groupId="com.nextapp" artifactId="echo3-app" version="${echo.version}" classifier="sources"/>
+            <dependency groupId="com.nextapp" artifactId="echo3-webcontainer" version="${echo.version}"/>
+            <dependency groupId="com.nextapp" artifactId="echo3-webcontainer" version="${echo.version}" classifier="sources"/>
+            <dependency groupId="javax.servlet" artifactId="servlet-api" version="2.4"/>
+            <dependency groupId="javax.servlet" artifactId="servlet-api" version="2.4" classifier="sources"/>
+            <dependency groupId="jfree" artifactId="jcommon" version="1.0.15"/>
+            <dependency groupId="jfree" artifactId="jfreechart" version="1.0.12"/>
+        </artifact:dependencies>
+
+        <copy todir="${dir.lib}">
+            <fileset refid="dependency.fileset" />
+            <mapper type="flatten" />
+        </copy>
+    </target>
+
+    <target name="dependencies" depends="-check.dependencies" unless="dependencies.present"
+            description="Spot checks for dependency JARs availability and fetches via Maven Central if required">
+        <antcall target="mvn.dependencies"/>
+    </target>
     
     <!-- Minimize -->
     <target name="minimize" depends="clean" description="Removes all non-essential files, including Eclipse temporary/build output files">
         <delete dir="${dir.temp}"/>
+        <delete dir="${dir.lib}"/>
     </target>
     
     <!-- Clean -->
@@ -67,13 +97,13 @@
         <delete dir="${dir.release}"/>
     </target>
     
-    <target name="compile.app" description="Compile Application source files">
+    <target name="compile.app" description="Compile Application source files" depends="dependencies">
         <mkdir dir="${dir.build.app}"/>
         <javac srcdir="${dir.src.app}" destdir="${dir.build.app}" debug="${debug}" deprecation="yes" 
                 source="${ant.build.javac.source}" target="${ant.build.javac.target}">
         	<classpath>
         		<pathelement path="${echo3.app.lib.jar}"/>
-        		<fileset dir="lib"/>
+        		<pathelement path="${jfreechart.lib.jar}"/>
         	 </classpath>
     	</javac>
         <copy todir="${dir.build.app}">
@@ -98,7 +128,7 @@
             	<pathelement path="${echo3.webcontainer.lib.jar}"/>
             	<pathelement path="${echo3.app.lib.jar}"/>
                 <pathelement path="${servlet.lib.jar}"/>
-            	<fileset dir="lib"/>
+                <pathelement path="${jfreechart.lib.jar}"/>
             </classpath>
         </javac>
         <copy todir="${dir.build.webcontainer}">
@@ -140,15 +170,12 @@
                 <pathelement path="${servlet.lib.jar}"/>
                 <pathelement path="${echo3.app.lib.jar}"/>
                 <pathelement path="${echo3.webcontainer.lib.jar}"/>
-            	<fileset dir="lib"/>
+                <pathelement path="${jfreechart.lib.jar}"/>
             </classpath>
         </javac>
         <copy todir="${dir.build.testapp}/WEB-INF/classes">
             <fileset dir="${dir.src.testapp}">
                 <patternset refid="fileset.resources"/>
-            </fileset>
-        	<fileset dir="${echo3.home}/src/server-java/testapp-interactive/lib">
-                <patternset refid="echo3.resources"/>
             </fileset>
         </copy>
     </target>
@@ -171,6 +198,7 @@
                 Header="${javadoc.header}">
             <classpath>
                 <pathelement path="${echo3.app.lib.jar}"/>
+                <pathelement path="${jfreechart.lib.jar}"/>
             </classpath>
         </javadoc>
     </target>
@@ -206,8 +234,7 @@
                 <pathelement path="${echo3.app.lib.jar}"/>
                 <pathelement path="${echo3.webcontainer.lib.jar}"/>
                 <pathelement path="${servlet.lib.jar}"/>
-                <pathelement path="${ft.commons-io.lib.jar}"/>
-                <pathelement path="${ft.commons-fileupload.lib.jar}"/>
+                <pathelement path="${jfreechart.lib.jar}"/>
             </classpath>
         </javadoc>
     </target>
@@ -227,11 +254,11 @@
                 <pathelement path="${echo3.app.lib.jar}"/>
                 <pathelement path="${echo3.webcontainer.lib.jar}"/>
                 <pathelement path="${servlet.lib.jar}"/>
-                <pathelement path="${ft.commons-io.lib.jar}"/>
-                <pathelement path="${ft.commons-fileupload.lib.jar}"/>
             </classpath>
         </javadoc>
     </target>
+
+	<target name="test" depends="jslint" unless="skip.tests"/>
     
     <target name="doc.public" 
             depends="doc.app, doc.webcontainer"/>
@@ -239,7 +266,12 @@
     <target name="doc.private" 
             depends="doc.app.private, doc.webcontainer.private"/>
 
-    <target name="doc" 
+    <target name="doc.jars" depends="doc.public" description="Builds the *-javadoc.jar files">
+        <jar jarfile="${dir.dist.lib}/${docfile.chart.app}" basedir="${dir.javadoc.app.public}"/>
+        <jar jarfile="${dir.dist.lib}/${docfile.chart.webcontainer}" basedir="${dir.javadoc.webcontainer.public}"/>
+    </target>
+
+    <target name="doc"
             depends="doc.app, doc.app.private, doc.webcontainer, doc.webcontainer.private"/>
 	
     <target name="release" depends="clean, dist, dist.testapp, doc.public">
@@ -298,6 +330,108 @@
         <gzip src="${dir.release}/${tarfile.release}" zipfile="${dir.release}/${tgzfile.release}"/>
         <delete file="${dir.release}/${tarfile.release}"/>
     </target>
-    
+
+    <target name="-mvn.generate.pom">
+        <mkdir dir="${dir.build}/maven-pom"/>
+        <copy todir="${dir.build}/maven-pom" filtering="true" overwrite="true">
+            <fileset dir="resource/maven" includes="*.xml"/>
+            <filterset id="maven.pom.filters" begintoken="$${" endtoken="}">
+                <filter token="release.version" value="${release.version}"/>
+                <filter token="echo.version" value="${echo.version}"/>
+            </filterset>
+        </copy>
+    </target>
+
+    <target name="mvn.install" depends="dist, doc.jars, -mvn.generate.pom, -mvn.inittasks"
+            description="Installs the current release into the local maven repository">
+        <!-- Install Chart API module -->
+        <artifact:pom id="app-pom" file="${dir.build}/maven-pom/echo3chart-app-pom.xml" />
+        <artifact:install file="${dir.dist.lib}/${jarfile.chart.app}">
+            <pom refid="app-pom"/>
+            <attach file="${dir.dist.lib}/${srcfile.chart.app}" type="jar" classifier="sources"/>
+            <attach file="${dir.dist.lib}/${docfile.chart.app}" type="jar" classifier="javadoc"/>
+        </artifact:install>
+
+        <!-- Install Chart Web Servlet module -->
+        <artifact:pom id="webcontainer-pom" file="${dir.build}/maven-pom/echo3chart-webcontainer-pom.xml" />
+        <artifact:install file="${dir.dist.lib}/${jarfile.chart.webcontainer}">
+            <pom refid="webcontainer-pom"/>
+            <attach file="${dir.dist.lib}/${srcfile.chart.webcontainer}" type="jar" classifier="sources"/>
+            <attach file="${dir.dist.lib}/${docfile.chart.webcontainer}" type="jar" classifier="javadoc"/>
+        </artifact:install>
+    </target>
+
+    <target name="mvn.snapshot" depends="dist, doc.jars, -mvn.generate.pom, -mvn.inittasks"
+            description="Deploy snapshot version to configured Maven snapshot repository">
+        <!-- The artifact:deploy tasks do not repesct settings.xml for proxy/auth, so we use the mvn task -->
+        <!-- Deploy Echo API module. -->
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
+            <arg value="-Durl=${maven.repository.snapshots.url}" />
+            <arg value="-DrepositoryId=${maven.repository.snapshots.id}" />
+            <arg value="-DpomFile=${dir.build}/maven-pom/echo3chart-app-pom.xml" />
+            <arg value="-Dfile=${dir.dist.lib}/${jarfile.chart.app}" />
+            <arg value="-Dsources=${dir.dist.lib}/${srcfile.chart.app}" />
+            <arg value="-Djavadoc=${dir.dist.lib}/${docfile.chart.app}" />
+            <arg value="-e" />
+        </artifact:mvn>
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
+            <arg value="-Durl=${maven.repository.snapshots.url}" />
+            <arg value="-DrepositoryId=${maven.repository.snapshots.id}" />
+            <arg value="-DpomFile=${dir.build}/maven-pom/echo3chart-webcontainer-pom.xml" />
+            <arg value="-Dfile=${dir.dist.lib}/${jarfile.chart.webcontainer}" />
+            <arg value="-Dsources=${dir.dist.lib}/${srcfile.chart.webcontainer}" />
+            <arg value="-Djavadoc=${dir.dist.lib}/${docfile.chart.webcontainer}" />
+            <arg value="-e" />
+        </artifact:mvn>
+    </target>
+
+    <target name="mvn.stage" depends="dist, doc.jars, -mvn.generate.pom, -mvn.inittasks"
+            description="Deploy snapshot version to configured Maven snapshot repository">
+        <macrodef name="deploysigned">
+            <attribute name="module"/>
+            <attribute name="file"/>
+            <attribute name="classifier"/>
+
+            <sequential>
+                <artifact:mvn>
+                    <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+                    <arg value="-Durl=${maven.repository.staging.url}" />
+                    <arg value="-DrepositoryId=${maven.repository.staging.id}" />
+                    <arg value="-DpomFile=${dir.build}/maven-pom/echo3chart-@{module}-pom.xml" />
+                    <arg value="-Dfile=${dir.dist.lib}/@{file}" />
+                    <arg value="-Dclassifier=@{classifier}" />
+                    <arg value="-e" />
+                    <arg value="-Pgpg" />
+                </artifact:mvn>
+            </sequential>
+        </macrodef>
+
+        <deploysigned module="app" classifier=""        file="${jarfile.chart.app}"/>
+        <deploysigned module="app" classifier="sources" file="${srcfile.chart.app}"/>
+        <deploysigned module="app" classifier="javadoc" file="${docfile.chart.app}"/>
+
+        <deploysigned module="webcontainer" classifier=""        file="${jarfile.chart.webcontainer}"/>
+        <deploysigned module="webcontainer" classifier="sources" file="${srcfile.chart.webcontainer}"/>
+        <deploysigned module="webcontainer" classifier="javadoc" file="${docfile.chart.webcontainer}"/>
+    </target>
+
+    <target name="-mvn.inittasks" unless="mvntasks.initialized">
+        <taskdef resource="de/exxcellent/ant/tasks.properties" classpath="resource/maven/ant-exxtasks-1.0.jar"/>
+        <extendclasspath path="resource/maven/maven-ant-tasks-2.1.3.jar"/>
+        <available property="mvntasks.initialized" classname="org.apache.maven.project.MavenProject"/>
+    </target>
+
+    <target name="jslint.webcontainer"  unless="skip.tests">
+        <java fork="true" jar="${dir.resource.jslint}/rhino.jar">
+            <arg value="${dir.resource.jslint}/jslint.js"/>
+            <arg value="${dir.src.webcontainer.res}/"/>
+        </java>
+    </target>
+
+    <target name="jslint" depends="jslint.webcontainer">
+    </target>
+
 </project>
 
