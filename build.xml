@@ -177,9 +177,6 @@
             <fileset dir="${dir.src.testapp}">
                 <patternset refid="fileset.resources"/>
             </fileset>
-        	<fileset dir="${echo3.home}/src/server-java/testapp-interactive/lib">
-                <patternset refid="echo3.resources"/>
-            </fileset>
         </copy>
     </target>
 
