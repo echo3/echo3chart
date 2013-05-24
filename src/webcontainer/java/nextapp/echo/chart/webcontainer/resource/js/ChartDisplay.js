@@ -64,7 +64,7 @@ Echo.Chart.Render.ChartDisplaySync = Core.extend(Echo.Render.ComponentSync, {
         	this._mapNode = mapE;
         	parentElement.appendChild(mapE);
         	mapE.name = this.component.renderId;
-	        for (i = 0; i < map.length; i++) {
+	        for (var i = 0; i < map.length; i++) {
 	        	var entry = map[i];
 	        	var areaE = document.createElement("area");
 	        	mapE.appendChild(areaE);

@@ -996,9 +996,9 @@ JSLINT = function () {
             }
             t = Object.create(t);
             if (type === '(string)' || type === '(range)') {
-                if (jx.test(value)) {
+                /*if (jx.test(value)) {
                     warningAt("Script URL.", line, from);
-                }
+                }*/
             }
             if (type === '(identifier)') {
                 t.identifier = true;
