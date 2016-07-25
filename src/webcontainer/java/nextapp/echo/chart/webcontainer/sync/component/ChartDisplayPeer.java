@@ -74,8 +74,7 @@ public class ChartDisplayPeer extends AbstractComponentSynchronizePeer {
     }
 
     public String getClientComponentType(boolean shortType) {
-	//return shortType ? "ECD" : "EchoChartDisplay";
-	return "EchoChartDisplay";
+	return shortType ? "ECD" : "EchoChartDisplay";
     }
 
     public Object getOutputProperty(Context context, Component component, String propertyName, int propertyIndex) {
