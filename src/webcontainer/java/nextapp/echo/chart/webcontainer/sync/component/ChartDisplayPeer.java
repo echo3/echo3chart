@@ -18,10 +18,11 @@ package nextapp.echo.chart.webcontainer.sync.component;
 
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import nextapp.echo.app.Component;
 import nextapp.echo.app.Extent;
-import nextapp.echo.app.text.TextComponent;
 import nextapp.echo.app.update.ClientUpdateManager;
 import nextapp.echo.app.update.ServerComponentUpdate;
 import nextapp.echo.app.util.Context;
@@ -105,7 +106,7 @@ public class ChartDisplayPeer
         
         Extent eheight = (Extent) chartDisplay.getRenderProperty(ChartDisplay.PROPERTY_HEIGHT); 
         int height = ewidth != null ? eheight.getValue() : ChartDisplayPeer.DEFAULT_HEIGHT;
-        
+        try {
         JFreeChart chart =  chartDisplay.getChart();
         BufferedImage image;
         ChartRenderingInfo info = new ChartRenderingInfo();
@@ -113,12 +114,6 @@ public class ChartDisplayPeer
             image = chart.createBufferedImage(width, height, info);
         }
         EntityCollection coll = info.getEntityCollection();
-//        debug("About to show entities");
-//        for (int i = 0; i < coll.getEntityCount(); i++) {
-//        	debug("Entity: " + coll.getEntity(i).getShapeCoords());
-//        	debug("Entity: " + coll.getEntity(i).getShapeType());
-//        	debug("Entity: " + coll.getEntity(i).getToolTipText());
-//        }
         sb.append("[");
         for (int i = 0; i < coll.getEntityCount(); i++) {
         	if (i > 0) {
@@ -126,11 +121,21 @@ public class ChartDisplayPeer
         	}
         	sb.append("{ shapeType: '" + coll.getEntity(i).getShapeType() + "'");
         	sb.append(", shapeCoords: '" + coll.getEntity(i).getShapeCoords() + "'");
+		if (chartDisplay.getActionCommands() != null) {
+		    if (chartDisplay.getActionCommands().length > i) {
+
         	sb.append(", actionCommand: '" + chartDisplay.getActionCommands()[i] + "'");
+
+		    }
+		}
+
         	sb.append(", toolTipText: '" + coll.getEntity(i).getToolTipText() + "'}");
         	
         }
         sb.append("]");
+	} catch (Exception e) {
+	    Logger.getLogger(ChartDisplayPeer.class.getName()).log(Level.SEVERE, "Error : " + e);
+	}
     	
     	return sb.toString();
     }
